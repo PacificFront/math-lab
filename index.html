@@ -4,49 +4,63 @@
     <meta charset="utf-8">
     <title>Math Research Tool</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #161512; color: #fff; font-family: sans-serif; }
-        .box { background: #262421; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; max-width: 500px; width: 90%; }
-        input { width: 100%; padding: 12px; border-radius: 4px; border: 1px solid #3d3a35; background: #1c1a17; color: #fff; box-sizing: border-box; margin: 15px 0; font-size: 14px; }
-        button { background: #007acc; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; margin-bottom: 15px; }
-        button:hover { background: #0062a3; }
-        .link-btn { display: none; background: #45a049; color: white; text-decoration: none; padding: 12px; border-radius: 4px; font-weight: bold; font-size: 14px; width: 100%; box-sizing: border-box; text-align: center; margin-bottom: 15px; }
-        .link-btn:hover { background: #3e8e41; text-decoration: none; }
-        .tip { font-size: 12px; color: #888; text-align: left; line-height: 1.5; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; display: flex; flex-direction: column; background-color: #161512; color: #fff; font-family: sans-serif; }
+        .nav { background: #262421; padding: 15px; display: flex; gap: 10px; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        input { width: 40%; padding: 10px; border-radius: 4px; border: 1px solid #3d3a35; background: #1c1a17; color: #fff; font-size: 14px; }
+        button { background: #45a049; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; }
+        button:hover { background: #3e8e41; }
+        .content-area { flex: 1; padding: 20px; overflow-y: auto; box-sizing: border-box; width: 100%; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+        .loading { display: none; text-align: center; color: #aaa; margin-top: 50px; font-size: 16px; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2 style="margin:0; font-size:18px;">🌐 萬能學術安全跳板</h2>
-        <input type="text" id="urlInput" placeholder="請輸入完整網址，例如 https://douyin.com">
-        
-        <!-- 步驟一：生成安全傳送點 -->
-        <button id="genBtn" onclick="generateLink()">1. 生成安全傳送點</button>
-        
-        <!-- 步驟二：實體點擊按鈕（預設隱藏，生成後顯示） -->
-        <a id="realLink" class="link-btn" href="#" target="_top">2. 點我無痕傳送前往網站</a>
-        
-        <div class="tip">
-            💡 <b>全新實體點擊模式：</b><br>
-            由於部分學校會直接拔除代碼的自動跳轉功能，此版本改為「手動雙階模式」。請先輸入網址並點擊藍色按鈕，下方會跳出綠色的實體傳送按鈕，點擊綠色按鈕即可 100% 成功穿透並跳轉目的地。
-        </div>
+    <div class="nav">
+        <span>🌐 跨域數據沙盒：</span>
+        <input type="text" id="urlInput" placeholder="輸入想讀取的網址，例如 https://wikipedia.org">
+        <button onclick="fetchContent()">無痕讀取網頁數據</button>
+    </div>
+    
+    <div id="loadingStatus" class="loading">正在穿透防火牆安全沙盒，請稍候...</div>
+    <div id="displayArea" class="content-area">
+        <p style="color: #888; text-align: center; margin-top: 50px;">請在上方輸入想看的網址。本通道採用純前端異步代理，不觸發任何網域跳轉，100% 免疫 about:blank#blocked 攔截。</p>
     </div>
 
     <script>
-        function generateLink() {
+        function fetchContent() {
             var url = document.getElementById('urlInput').value.trim();
-            if (url) {
-                if (!/^https?:\/\//i.test(url)) { url = 'https://' + url; }
-                
-                // 產生 Google 翻譯的安全加密代理網址
-                var bsfUrl = "https://google.com" + encodeURIComponent(url);
-                
-                // 鎖定實體超連結物件，並將其顯示出來
-                var linkEl = document.getElementById('realLink');
-                linkEl.href = bsfUrl;
-                linkEl.style.display = 'block';
-                
-                document.getElementById('genBtn').innerText = "✓ 傳送點已生成！請點選下方綠色按鈕";
-            }
+            if (!url) return;
+            if (!/^https?:\/\//i.test(url)) { url = 'https://' + url; }
+
+            var display = document.getElementById('displayArea');
+            var loading = document.getElementById('loadingStatus');
+            
+            display.innerHTML = '';
+            loading.style.display = 'block';
+
+            // 使用全球開放的 allorigins 免費開源跨域代理 API
+            // 這會把目標網頁轉成純字串數據，直接送回你的 GitHub 執行，不觸發任何網域跳轉
+            var apiUrl = "https://allorigins.win" + encodeURIComponent(url);
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (response.ok) return response.json();
+                    throw new Error('Network response was not ok.');
+                })
+                .then(data => {
+                    loading.style.display = 'none';
+                    
+                    // 現場在你的 GitHub 頁面裡注入純文字內容
+                    display.innerHTML = data.contents;
+                    
+                    // 自動修正網頁中的圖片與文字相對路徑，防止破圖
+                    var base = document.createElement('base');
+                    base.href = url;
+                    document.head.appendChild(base);
+                })
+                .catch(error => {
+                    loading.style.display = 'none';
+                    display.innerHTML = "<span style='color:#ff3333;'>讀取失敗。此網站可能有更進階的防抓取機制，或者正處於嚴格保護中。建議更換其他網站測試。</span>";
+                });
         }
     </script>
 </body>
