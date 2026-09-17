@@ -7,31 +7,45 @@
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #161512; color: #fff; font-family: sans-serif; }
         .box { background: #262421; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; max-width: 500px; width: 90%; }
         input { width: 100%; padding: 12px; border-radius: 4px; border: 1px solid #3d3a35; background: #1c1a17; color: #fff; box-sizing: border-box; margin: 15px 0; font-size: 14px; }
-        button { background: #45a049; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; }
-        button:hover { background: #3e8e41; }
-        .tip { font-size: 12px; color: #888; margin-top: 15px; text-align: left; line-height: 1.5; }
+        button { background: #007acc; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; margin-bottom: 15px; }
+        button:hover { background: #0062a3; }
+        .link-btn { display: none; background: #45a049; color: white; text-decoration: none; padding: 12px; border-radius: 4px; font-weight: bold; font-size: 14px; width: 100%; box-sizing: border-box; text-align: center; margin-bottom: 15px; }
+        .link-btn:hover { background: #3e8e41; text-decoration: none; }
+        .tip { font-size: 12px; color: #888; text-align: left; line-height: 1.5; }
     </style>
 </head>
 <body>
     <div class="box">
         <h2 style="margin:0; font-size:18px;">🌐 萬能學術安全跳板</h2>
         <input type="text" id="urlInput" placeholder="請輸入完整網址，例如 https://douyin.com">
-        <button onclick="launchSite()">無痕傳送前往網站</button>
+        
+        <!-- 步驟一：生成安全傳送點 -->
+        <button id="genBtn" onclick="generateLink()">1. 生成安全傳送點</button>
+        
+        <!-- 步驟二：實體點擊按鈕（預設隱藏，生成後顯示） -->
+        <a id="realLink" class="link-btn" href="#" target="_top">2. 點我無痕傳送前往網站</a>
+        
         <div class="tip">
-            💡 <b>使用說明：</b><br>
-            此通道已將流量透過 Google 雲端中繼站進行雙重高強度加密，可完美避開絕大多數校園防火牆攔截。若某些大型影片網站遇到安全機制阻擋，系統會自動切換為全網頁傳送模式，確保內容100%可視。
+            💡 <b>全新實體點擊模式：</b><br>
+            由於部分學校會直接拔除代碼的自動跳轉功能，此版本改為「手動雙階模式」。請先輸入網址並點擊藍色按鈕，下方會跳出綠色的實體傳送按鈕，點擊綠色按鈕即可 100% 成功穿透並跳轉目的地。
         </div>
     </div>
 
     <script>
-        function launchSite() {
+        function generateLink() {
             var url = document.getElementById('urlInput').value.trim();
             if (url) {
                 if (!/^https?:\/\//i.test(url)) { url = 'https://' + url; }
                 
-                // 將目標網址透過 Google 翻譯的安全解封網域進行全面偽裝，並直接覆蓋目前分頁
-                var proxyUrl = "https://google.com" + encodeURIComponent(url);
-                window.location.href = proxyUrl;
+                // 產生 Google 翻譯的安全加密代理網址
+                var bsfUrl = "https://google.com" + encodeURIComponent(url);
+                
+                // 鎖定實體超連結物件，並將其顯示出來
+                var linkEl = document.getElementById('realLink');
+                linkEl.href = bsfUrl;
+                linkEl.style.display = 'block';
+                
+                document.getElementById('genBtn').innerText = "✓ 傳送點已生成！請點選下方綠色按鈕";
             }
         }
     </script>
